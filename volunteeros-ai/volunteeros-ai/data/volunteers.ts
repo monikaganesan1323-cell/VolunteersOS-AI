@@ -1,0 +1,23 @@
+import { Volunteer } from "@/types";
+
+export const volunteers: Volunteer[] = [
+  { id: "V-1042", name: "Ananya Krishnan", email: "ananya.k@gmail.com", phone: "+91 98470 22314", city: "Kochi", skills: ["First Aid", "Event Planning", "Photography"], interests: ["Health", "Education"], hours: 214, xp: 8420, level: 12, eventsAttended: 38, status: "active", joinedOn: "2023-06-14", badges: ["Century Club", "Team Lead", "Perfect Attendance"], organization: "Rotaract Kochi", previousOrganization: "Kochi Lions Youth Wing", previousPosition: "Secretary", previousJoinedOn: "2021-08-01", certificationProofs: ["lions-youth-cert.pdf", "first-aid-cert.pdf"] },
+  { id: "V-1043", name: "Rahul Menon", email: "rahul.menon@outlook.com", phone: "+91 90480 11267", city: "Thiruvananthapuram", skills: ["Public Speaking", "Logistics"], interests: ["Environment", "Disaster Relief"], hours: 156, xp: 6210, level: 9, eventsAttended: 27, status: "active", joinedOn: "2023-09-02", badges: ["Eco Warrior"], organization: "NSS TVM" },
+  { id: "V-1044", name: "Fathima Zahra", email: "fathima.zahra@icloud.com", phone: "+91 87560 44521", city: "Kozhikode", skills: ["Teaching", "Content Writing", "Translation"], interests: ["Education", "Literacy"], hours: 302, xp: 11040, level: 15, eventsAttended: 46, status: "active", joinedOn: "2022-11-20", badges: ["Century Club", "Mentor", "Top Contributor"], organization: "Teach For Kerala" },
+  { id: "V-1045", name: "Arjun Nair", email: "arjun.nair94@gmail.com", phone: "+91 99610 33982", city: "Kochi", skills: ["Driving", "Coordination"], interests: ["Disaster Relief"], hours: 88, xp: 3120, level: 6, eventsAttended: 14, status: "inactive", joinedOn: "2024-01-10", badges: ["Rapid Responder"], organization: "Kerala Disaster Corps" },
+  { id: "V-1046", name: "Meera Pillai", email: "meera.pillai@yahoo.com", phone: "+91 96330 78214", city: "Kollam", skills: ["Nursing", "Counseling"], interests: ["Health", "Elderly Care"], hours: 271, xp: 9870, level: 13, eventsAttended: 41, status: "active", joinedOn: "2022-08-05", badges: ["Century Club", "Care Champion"], organization: "Red Cross Kollam" },
+  { id: "V-1047", name: "Vishnu Prasad", email: "vishnu.p@gmail.com", phone: "+91 88910 55671", city: "Thrissur", skills: ["Videography", "Social Media"], interests: ["Youth Programs"], hours: 63, xp: 2140, level: 4, eventsAttended: 9, status: "pending", joinedOn: "2024-04-22", badges: [], organization: "Youth4Change" },
+  { id: "V-1048", name: "Diya Suresh", email: "diya.suresh@gmail.com", phone: "+91 91234 67890", city: "Kochi", skills: ["Graphic Design", "Fundraising"], interests: ["Arts", "Education"], hours: 189, xp: 7050, level: 10, eventsAttended: 31, status: "active", joinedOn: "2023-03-17", badges: ["Design Guild"], organization: "Rotaract Kochi" },
+  { id: "V-1049", name: "Karthik Iyer", email: "karthik.iyer@hotmail.com", phone: "+91 79040 22156", city: "Alappuzha", skills: ["Sports Coaching", "First Aid"], interests: ["Sports", "Youth Programs"], hours: 122, xp: 4890, level: 7, eventsAttended: 21, status: "active", joinedOn: "2023-07-29", badges: ["Field Champion"], organization: "Alappuzha Sports Trust" },
+  { id: "V-1050", name: "Sneha Thomas", email: "sneha.thomas@gmail.com", phone: "+91 94950 11002", city: "Kottayam", skills: ["Accounting", "Data Entry"], interests: ["Administration"], hours: 145, xp: 5430, level: 8, eventsAttended: 24, status: "active", joinedOn: "2023-05-11", badges: ["Detail Oriented"], organization: "CSR Kottayam" },
+  { id: "V-1051", name: "Aditya Varma", email: "aditya.varma@gmail.com", phone: "+91 90000 22331", city: "Kochi", skills: ["Drone Operation", "Mapping"], interests: ["Disaster Relief", "Environment"], hours: 97, xp: 3660, level: 6, eventsAttended: 16, status: "active", joinedOn: "2023-10-08", badges: ["Tech Squad"], organization: "Kerala Disaster Corps" },
+  { id: "V-1052", name: "Priya Nambiar", email: "priya.nambiar@gmail.com", phone: "+91 93830 44771", city: "Kannur", skills: ["Cooking", "Event Planning"], interests: ["Community Kitchen"], hours: 178, xp: 6720, level: 9, eventsAttended: 29, status: "active", joinedOn: "2023-02-25", badges: ["Community Cook"], organization: "Kannur Seva Samiti" },
+  { id: "V-1053", name: "Nikhil Raj", email: "nikhil.raj@gmail.com", phone: "+91 89430 66210", city: "Palakkad", skills: ["Carpentry", "Repair Work"], interests: ["Housing", "Disaster Relief"], hours: 54, xp: 1890, level: 3, eventsAttended: 7, status: "inactive", joinedOn: "2024-02-14", badges: [], organization: "Habitat Kerala" },
+];
+
+export const volunteerStats = {
+  total: 10482,
+  active: 8214,
+  newThisMonth: 342,
+  avgHoursPerVolunteer: 34.6,
+};
