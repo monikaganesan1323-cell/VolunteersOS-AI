@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { volunteers } from "@/data/volunteers";
+import { useStore } from "@/lib/store";
 import { Volunteer, VolunteerStatus } from "@/types";
 import { cn, formatDate } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -138,13 +138,14 @@ function AdminDetailsTrigger({ volunteer }: { volunteer: Volunteer }) {
 }
 
 export function VolunteerTable() {
+  const { volunteers } = useStore();
   const [globalFilter, setGlobalFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<VolunteerStatus | "all">("all");
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const data = useMemo(
     () => (statusFilter === "all" ? volunteers : volunteers.filter((v) => v.status === statusFilter)),
-    [statusFilter]
+    [volunteers, statusFilter]
   );
 
   const table = useReactTable({

@@ -24,6 +24,7 @@ export interface Volunteer {
   previousOrganization?: string;
   previousPosition?: PreviousPosition;
   previousJoinedOn?: string;
+  previousEventsParticipated?: string;
   certificationProofs?: string[];
 }
 

@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import {
-  User, Palette, Lock, Bell, ShieldCheck, Building2, KeyRound, Copy, Plus,
+  User, Palette, Lock, Bell, ShieldCheck, Building2, KeyRound, Copy, Plus, LogIn, LogOut,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,6 +28,7 @@ const tabs = [
 ];
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
 
@@ -75,7 +78,21 @@ export default function SettingsPage() {
                     <Input defaultValue="monika@rotaractkochi.org" />
                   </div>
                 </div>
-                <Button onClick={() => toast.success("Profile updated")}>Save changes</Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button onClick={() => toast.success("Profile updated")}>Save changes</Button>
+                  <Button variant="outline" asChild>
+                    <Link href="/login"><LogIn size={15} /> Login</Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      toast.success("Signed out.");
+                      router.push("/login");
+                    }}
+                  >
+                    <LogOut size={15} /> Logout
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </Tabs.Content>

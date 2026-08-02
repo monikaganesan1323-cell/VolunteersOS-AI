@@ -1,10 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Clock, Award, TrendingUp, Star, ArrowRight, MapPin, CalendarDays } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { currentVolunteer } from "@/components/portal/sidebar";
-import { events } from "@/data/events";
+import { useEvents } from "@/lib/event-store";
 import { certificates } from "@/data/misc";
 import { formatDate } from "@/lib/utils";
 
@@ -15,6 +17,7 @@ const statusVariant: Record<string, "success" | "warning" | "secondary"> = {
 };
 
 export default function PortalHomePage() {
+  const { events } = useEvents();
   const upcoming = events.filter((e) => e.status === "upcoming").slice(0, 5);
   const myCertificates = certificates.filter((c) => c.volunteerName === currentVolunteer.name);
 

@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { MapPin, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { events } from "@/data/events";
+import { useEvents } from "@/lib/event-store";
 import { formatDate } from "@/lib/utils";
+import { currentVolunteer } from "@/components/portal/sidebar";
+import { EventDetailDialog } from "@/components/portal/event-detail-dialog";
+import { useRegistrations } from "@/lib/registration-store";
+import { useNotifications } from "@/lib/notification-store";
+import type { VolunteerEvent } from "@/types";
 
 const statusStyle: Record<string, "success" | "warning" | "secondary"> = {
   upcoming: "success",
@@ -15,21 +21,43 @@ const statusStyle: Record<string, "success" | "warning" | "secondary"> = {
 };
 
 export default function PortalEventsPage() {
-  const [applied, setApplied] = useState<string[]>([]);
+  const [selected, setSelected] = useState<VolunteerEvent | null>(null);
+  const { events } = useEvents();
+  const { isRegistered, register } = useRegistrations(currentVolunteer.id);
+  const { addNotification } = useNotifications();
   const visible = events.filter((e) => e.status !== "cancelled");
+
+  function handleRegister(event: VolunteerEvent) {
+    register(event.id, currentVolunteer.name);
+    addNotification({
+      type: "registration",
+      title: `${currentVolunteer.name} registered for ${event.title}`,
+      body: `${currentVolunteer.city} · ${currentVolunteer.organization} · contact ${currentVolunteer.phone}`,
+    });
+    toast.success(`Registered for ${event.title}.`);
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">Browse Events</h1>
-        <p className="text-sm text-muted-foreground">Find an event and apply — organizers review requests from here.</p>
+        <p className="text-sm text-muted-foreground">Click an event to see details and register.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((e) => {
-          const hasApplied = applied.includes(e.id);
+          const hasApplied = isRegistered(e.id);
           return (
-            <div key={e.id} className="flex flex-col rounded-2xl border border-border bg-card p-5 shadow-glass">
+            <div
+              key={e.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => setSelected(e)}
+              onKeyDown={(evt) => {
+                if (evt.key === "Enter" || evt.key === " ") setSelected(e);
+              }}
+              className="flex cursor-pointer flex-col rounded-2xl border border-border bg-card p-5 text-left shadow-glass transition-shadow hover:shadow-warm-lg"
+            >
               <div className="flex items-start justify-between gap-2">
                 <span className="text-xs font-medium text-espresso-600/70 dark:text-crema-300/60">{e.organization}</span>
                 <Badge variant={statusStyle[e.status]} className="shrink-0 capitalize">{e.status}</Badge>
@@ -47,14 +75,24 @@ export default function PortalEventsPage() {
                 variant={hasApplied ? "secondary" : "default"}
                 disabled={hasApplied || e.status === "completed"}
                 className="mt-4"
-                onClick={() => setApplied((a) => [...a, e.id])}
+                onClick={(evt) => {
+                  evt.stopPropagation();
+                  handleRegister(e);
+                }}
               >
-                {hasApplied ? "Applied" : "Apply now"}
+                {hasApplied ? "Registered" : "Register now"}
               </Button>
             </div>
           );
         })}
       </div>
+
+      <EventDetailDialog
+        event={selected}
+        registered={selected ? isRegistered(selected.id) : false}
+        onClose={() => setSelected(null)}
+        onRegister={() => selected && handleRegister(selected)}
+      />
     </div>
   );
 }

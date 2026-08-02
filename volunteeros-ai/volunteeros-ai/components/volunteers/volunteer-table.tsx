@@ -82,12 +82,13 @@ function AdminDetailsTrigger({ volunteer }: { volunteer: Volunteer }) {
               onClick={() => setOpen(false)}
               className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 top-1/2 z-50 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
-            >
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
+              >
               <button onClick={() => setOpen(false)} className="absolute right-4 top-4" aria-label="Close">
                 <X size={18} />
               </button>
@@ -129,7 +130,8 @@ function AdminDetailsTrigger({ volunteer }: { volunteer: Volunteer }) {
                   </div>
                 )}
               </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
@@ -137,14 +139,17 @@ function AdminDetailsTrigger({ volunteer }: { volunteer: Volunteer }) {
   );
 }
 
-export function VolunteerTable() {
+export function VolunteerTable({ volunteers: rows }: { volunteers?: Volunteer[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<VolunteerStatus | "all">("all");
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  // Falls back to the seeded list when no rows are passed in.
+  const source = rows ?? volunteers;
+
   const data = useMemo(
-    () => (statusFilter === "all" ? volunteers : volunteers.filter((v) => v.status === statusFilter)),
-    [statusFilter]
+    () => (statusFilter === "all" ? source : source.filter((v) => v.status === statusFilter)),
+    [source, statusFilter]
   );
 
   const table = useReactTable({

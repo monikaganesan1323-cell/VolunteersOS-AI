@@ -1,10 +1,15 @@
+"use client";
+
 import { Users, UserCheck, UserPlus, Clock } from "lucide-react";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { VolunteerTable } from "@/components/volunteers/volunteer-table";
+import { AddVolunteerDialog } from "@/components/volunteers/add-volunteer-dialog";
 import { volunteerStats } from "@/data/volunteers";
-import { Button } from "@/components/ui/button";
+import { useVolunteers } from "@/lib/volunteer-store";
 
 export default function VolunteersPage() {
+  const { volunteers, addVolunteer } = useVolunteers();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -16,9 +21,7 @@ export default function VolunteersPage() {
             {volunteerStats.total.toLocaleString("en-IN")} volunteers across your network.
           </p>
         </div>
-        <Button>
-          <UserPlus size={15} /> Add Volunteer
-        </Button>
+        <AddVolunteerDialog onCreate={addVolunteer} />
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -28,7 +31,7 @@ export default function VolunteersPage() {
         <StatCard icon={Clock} label="Avg Hours / Volunteer" value={`${volunteerStats.avgHoursPerVolunteer}h`} />
       </div>
 
-      <VolunteerTable />
+      <VolunteerTable volunteers={volunteers} />
     </div>
   );
 }

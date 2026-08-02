@@ -10,20 +10,24 @@ import { SocialLogin } from "@/components/shared/social-login";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useStore } from "@/lib/store";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { signIn } = useStore();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    const session = signIn({ email });
     setTimeout(() => {
       setLoading(false);
-      toast.success("Welcome back!");
+      toast.success(`Welcome back, ${session.name.split(" ")[0]}!`);
       router.push("/dashboard");
-    }, 900);
+    }, 700);
   }
 
   return (
@@ -31,7 +35,14 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="you@organization.org" required />
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@organization.org"
+            required
+          />
         </div>
 
         <div className="space-y-1.5">

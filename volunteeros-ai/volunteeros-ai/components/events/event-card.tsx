@@ -1,8 +1,11 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { CalendarDays, MapPin, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { RegisterButton } from "@/components/events/register-button";
 import { VolunteerEvent } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -27,11 +30,19 @@ const categoryGradients: Record<string, string> = {
 };
 
 export function EventCard({ event }: { event: VolunteerEvent }) {
+  const router = useRouter();
   const fillRate = (event.registered / event.capacity) * 100;
 
   return (
-    <Link href={`/events/${event.id}`}>
-      <Card className="group h-full overflow-hidden transition-all hover:-translate-y-1 hover:shadow-warm">
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push(`/events/${event.id}`)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") router.push(`/events/${event.id}`);
+      }}
+      className="group h-full cursor-pointer overflow-hidden transition-all hover:-translate-y-1 hover:shadow-warm"
+    >
         <div
           className={cn(
             "flex h-32 items-end bg-gradient-to-br p-4",
@@ -67,8 +78,9 @@ export function EventCard({ event }: { event: VolunteerEvent }) {
             </div>
             <Progress value={fillRate} />
           </div>
+
+          <RegisterButton event={event} className="mt-4 w-full" />
         </CardContent>
       </Card>
-    </Link>
   );
 }

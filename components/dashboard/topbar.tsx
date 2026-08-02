@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Search, Bell, Moon, Sun, Menu, ChevronRight } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { UserMenu } from "@/components/dashboard/user-menu";
 
 function useBreadcrumb() {
   const pathname = usePathname();
@@ -61,11 +61,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         </button>
 
         <div className="ml-1 flex items-center gap-2.5 border-l border-border pl-3">
-          <Avatar name="Monika Varghese" size={36} />
-          <div className="hidden leading-tight sm:block">
-            <div className="text-sm font-medium text-foreground">Monika Varghese</div>
-            <div className="text-xs text-muted-foreground">Program Admin</div>
-          </div>
+          <UserMenu />
         </div>
       </div>
     </header>

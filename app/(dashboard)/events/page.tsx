@@ -5,14 +5,16 @@ import {
   useReactTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel,
   getSortedRowModel, createColumnHelper, SortingState,
 } from "@tanstack/react-table";
-import { Plus, Search, LayoutGrid, Table2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, LayoutGrid, Table2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { EventCard } from "@/components/events/event-card";
 import { EventTable } from "@/components/events/event-table";
+import { CreateEventDialog } from "@/components/events/create-event-dialog";
 import { SimilarityRecommendations } from "@/components/events/similarity-recommendations";
-import { events, eventStats } from "@/data/events";
+import { eventStats } from "@/data/events";
+import { useStore } from "@/lib/store";
 import { VolunteerEvent } from "@/types";
 import { CalendarDays, CalendarClock, TrendingUp, PieChart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,6 +33,7 @@ const columns = [
 ];
 
 export default function EventsPage() {
+  const { events, createdEvents } = useStore();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<(typeof statuses)[number]>("all");
   const [view, setView] = useState<"table" | "grid">("table");
@@ -44,7 +47,7 @@ export default function EventsPage() {
         e.organization.toLowerCase().includes(query.toLowerCase());
       return matchesStatus && matchesQuery;
     });
-  }, [query, status]);
+  }, [events, query, status]);
 
   const table = useReactTable({
     data: filtered,
@@ -63,16 +66,26 @@ export default function EventsPage() {
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">Events</h1>
-          <p className="text-sm text-muted-foreground">{eventStats.total} events run to date.</p>
+          <p className="text-sm text-muted-foreground">
+            {eventStats.total + createdEvents.length} events run to date.
+          </p>
         </div>
-        <Button>
-          <Plus size={15} /> Create Event
-        </Button>
+        <CreateEventDialog />
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard icon={CalendarDays} label="Total Events" value={eventStats.total.toString()} />
-        <StatCard icon={CalendarClock} label="Upcoming" value={eventStats.upcoming.toString()} />
+        <StatCard
+          icon={CalendarDays}
+          label="Total Events"
+          value={(eventStats.total + createdEvents.length).toString()}
+        />
+        <StatCard
+          icon={CalendarClock}
+          label="Upcoming"
+          value={(
+            eventStats.upcoming + createdEvents.filter((e) => e.status === "upcoming").length
+          ).toString()}
+        />
         <StatCard icon={TrendingUp} label="This Month" value={eventStats.thisMonth.toString()} delta="+5" />
         <StatCard icon={PieChart} label="Avg Fill Rate" value={`${eventStats.avgFillRate}%`} />
       </div>

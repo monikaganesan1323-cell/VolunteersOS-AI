@@ -28,16 +28,10 @@ export function middleware(request: NextRequest) {
   const isPortalHost = host.includes(`:${PORTAL_PORT}`);
 
   const isAdminPath = matchesPrefix(pathname, ADMIN_ONLY_PREFIXES);
-  const isPortalPath = pathname === "/portal" || pathname.startsWith("/portal/");
 
   // Volunteer portal (localhost:3001) should never render admin pages.
   if (isPortalHost && isAdminPath) {
     return NextResponse.redirect(new URL("/portal", request.url));
-  }
-
-  // Admin (localhost:3000) should never render the volunteer portal.
-  if (!isPortalHost && isPortalPath) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   // Admin root ("/") skips the marketing landing page and goes straight

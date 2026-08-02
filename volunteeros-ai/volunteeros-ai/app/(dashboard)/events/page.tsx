@@ -5,14 +5,16 @@ import {
   useReactTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel,
   getSortedRowModel, createColumnHelper, SortingState,
 } from "@tanstack/react-table";
-import { Plus, Search, LayoutGrid, Table2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, LayoutGrid, Table2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { CreateEventDialog } from "@/components/events/create-event-dialog";
 import { EventCard } from "@/components/events/event-card";
 import { EventTable } from "@/components/events/event-table";
 import { SimilarityRecommendations } from "@/components/events/similarity-recommendations";
-import { events, eventStats } from "@/data/events";
+import { eventStats } from "@/data/events";
+import { useEvents } from "@/lib/event-store";
 import { VolunteerEvent } from "@/types";
 import { CalendarDays, CalendarClock, TrendingUp, PieChart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,16 +37,17 @@ export default function EventsPage() {
   const [status, setStatus] = useState<(typeof statuses)[number]>("all");
   const [view, setView] = useState<"table" | "grid">("table");
   const [sorting, setSorting] = useState<SortingState>([]);
+  const { events: allEvents, addEvent } = useEvents();
 
   const filtered = useMemo(() => {
-    return events.filter((e) => {
+    return allEvents.filter((e) => {
       const matchesStatus = status === "all" || e.status === status;
       const matchesQuery =
         e.title.toLowerCase().includes(query.toLowerCase()) ||
         e.organization.toLowerCase().includes(query.toLowerCase());
       return matchesStatus && matchesQuery;
     });
-  }, [query, status]);
+  }, [allEvents, query, status]);
 
   const table = useReactTable({
     data: filtered,
@@ -65,9 +68,7 @@ export default function EventsPage() {
           <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">Events</h1>
           <p className="text-sm text-muted-foreground">{eventStats.total} events run to date.</p>
         </div>
-        <Button>
-          <Plus size={15} /> Create Event
-        </Button>
+        <CreateEventDialog onCreate={addEvent} />
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -77,7 +78,7 @@ export default function EventsPage() {
         <StatCard icon={PieChart} label="Avg Fill Rate" value={`${eventStats.avgFillRate}%`} />
       </div>
 
-      <SimilarityRecommendations />
+      <SimilarityRecommendations events={allEvents} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">

@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-table";
 import {
   Search, ChevronLeft, ChevronRight, ArrowUpDown, X, Mail, Phone,
-  Building2, ShieldAlert, Send, CheckCircle2,
+  Building2, Send, CheckCircle2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -73,9 +73,38 @@ const columns = [
     cell: (info) => info.getValue().toLocaleString("en-IN"),
   }),
   columnHelper.accessor("events", { header: "Events" }),
+  columnHelper.accessor("contact", {
+    header: "Contact person",
+    cell: (info) => (
+      <span className="text-sm text-foreground">{info.getValue()}</span>
+    ),
+  }),
+  columnHelper.accessor("email", {
+    header: "Email",
+    cell: (info) => (
+      <a
+        href={`mailto:${info.getValue()}`}
+        className="flex items-center gap-1.5 text-xs font-medium text-espresso-600 hover:underline dark:text-crema-300"
+      >
+        <Mail size={13} className="shrink-0" />
+        <span className="max-w-[190px] truncate">{info.getValue()}</span>
+      </a>
+    ),
+  }),
+  columnHelper.accessor("phone", {
+    header: "Phone",
+    cell: (info) => (
+      <a
+        href={`tel:${info.getValue().replace(/\s/g, "")}`}
+        className="flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-espresso-600 hover:underline dark:text-crema-300"
+      >
+        <Phone size={13} className="shrink-0" /> {info.getValue()}
+      </a>
+    ),
+  }),
   columnHelper.display({
     id: "admin",
-    header: "Admin details",
+    header: "Message",
     cell: (info) => <AdminDetailsTrigger org={info.row.original} />,
   }),
 ];
@@ -99,9 +128,9 @@ function AdminDetailsTrigger({ org }: { org: Organization }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-xs font-medium text-espresso-600 hover:underline dark:text-crema-300"
+        className="flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-espresso-600 transition-colors hover:bg-espresso-50 dark:text-crema-300 dark:hover:bg-white/5"
       >
-        <ShieldAlert size={12} /> View
+        <Send size={12} /> Contact
       </button>
       <AnimatePresence>
         {open && (
@@ -141,7 +170,7 @@ function AdminDetailsTrigger({ org }: { org: Organization }) {
                     </span>
                     <div>
                       <div className="font-display text-sm font-semibold text-ink dark:text-crema-50">{org.name}</div>
-                      <Badge variant="warning" className="mt-0.5">Admin only</Badge>
+                      <Badge variant="secondary" className="mt-0.5">Sponsor contact</Badge>
                     </div>
                   </div>
 

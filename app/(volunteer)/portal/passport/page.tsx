@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Download, Star, Clock, Award, ShieldCheck } from "lucide-react";
 import { currentVolunteer } from "@/components/portal/sidebar";
+import { SessionButton } from "@/components/shared/session-button";
 import { initials } from "@/lib/utils";
 
 const qrCells = Array.from({ length: 64 }, (_, i) => (i * 37 + (i % 7) * 13) % 5 === 0);
@@ -13,11 +14,14 @@ export default function PortalPassportPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">My Passport</h1>
-        <p className="text-sm text-muted-foreground">
-          Your portable, verifiable profile — scan the QR to prove it at any partner organization.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">My Passport</h1>
+          <p className="text-sm text-muted-foreground">
+            Your portable, verifiable profile — scan the QR to prove it at any partner organization.
+          </p>
+        </div>
+        <SessionButton size="sm" />
       </div>
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_1.1fr]">

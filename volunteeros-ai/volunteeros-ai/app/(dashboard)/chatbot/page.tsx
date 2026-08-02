@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Sparkles, Send, Users, FileText, Search, BarChart3, Award } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAssistant } from "@/hooks/use-assistant";
 
 const suggestions = [
   { icon: FileText, label: "Generate this week's report" },
@@ -25,12 +26,10 @@ const inactivityReasons = [
   "Just needed a break",
 ];
 
-type Message = { from: "ai" | "user"; text: string };
-
 export default function ChatbotPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    { from: "ai", text: "Hi Monika! I'm your VolunteerOS AI assistant. Ask me to generate reports, match volunteers to events, draft certificates, or summarize analytics." },
-  ]);
+  const { messages, setMessages, pending, send } = useAssistant(
+    "Hi Monika! I'm your VolunteerOS AI assistant. Ask me to generate reports, match volunteers to events, draft certificates, or summarize analytics."
+  );
   const [input, setInput] = useState("");
   const [askedInactivity, setAskedInactivity] = useState(false);
   const [reasonGiven, setReasonGiven] = useState(false);
@@ -49,18 +48,13 @@ export default function ChatbotPage() {
       setAskedInactivity(true);
     }, 500);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function send(text: string) {
+  function handleSend(text: string) {
     if (!text.trim()) return;
-    setMessages((m) => [...m, { from: "user", text }]);
     setInput("");
-    setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        { from: "ai", text: "Here's what I found based on your current volunteer and event data — this is a demo response for the hackathon build." },
-      ]);
-    }, 700);
+    void send(text);
   }
 
   function sendReason(reason: string) {
@@ -97,6 +91,12 @@ export default function ChatbotPage() {
             </div>
           ))}
 
+          {pending && (
+            <div className="max-w-[80%] rounded-2xl bg-muted px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+              …
+            </div>
+          )}
+
           {askedInactivity && !reasonGiven && (
             <div className="flex flex-wrap gap-2 pl-1">
               {inactivityReasons.map((r) => (
@@ -116,7 +116,7 @@ export default function ChatbotPage() {
           {suggestions.map((s) => (
             <button
               key={s.label}
-              onClick={() => send(s.label)}
+              onClick={() => handleSend(s.label)}
               className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-espresso-700 hover:bg-espresso-50 dark:text-crema-200 dark:hover:bg-white/5"
             >
               <s.icon size={12} /> {s.label}
@@ -127,7 +127,7 @@ export default function ChatbotPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            send(input);
+            handleSend(input);
           }}
           className="flex items-center gap-2 border-t border-border p-4"
         >
@@ -137,7 +137,7 @@ export default function ChatbotPage() {
             placeholder="Ask the assistant..."
             className="h-11 flex-1 rounded-xl border border-border bg-muted/60 px-4 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          <Button type="submit" size="icon"><Send size={16} /></Button>
+          <Button type="submit" size="icon" disabled={pending}><Send size={16} /></Button>
         </form>
       </Card>
     </div>

@@ -1,23 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Megaphone, ShieldAlert, CalendarClock, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { aiMatches } from "@/data/misc";
-
-const topMatch = [...aiMatches].sort((a, b) => b.skillMatch - a.skillMatch)[0];
-
-const notifications = [
-  { type: "ai_recommendation", icon: Sparkles, title: `AI recommends ${topMatch.volunteerName} for ${topMatch.eventTitle}`, body: `${topMatch.skillMatch}% skill match as ${topMatch.recommendedRole}. ${topMatch.reason}`, time: "Just now" },
-  { type: "alert", icon: ShieldAlert, title: "Emergency Broadcast — Idukki Sector 4", body: "Heavy rainfall alert issued. All volunteers in the sector should check in with their team lead.", time: "3 hr ago" },
-  { type: "reminder", icon: CalendarClock, title: "Event reminder: Beach Cleanup Drive", body: "Your registered event starts tomorrow at 6:30 AM at Fort Kochi Beach.", time: "6 hr ago" },
-  { type: "announcement", icon: Megaphone, title: "New badge tier launched: Legend", body: "Volunteers crossing 10,000 XP now unlock the Legend badge tier.", time: "1 day ago" },
-  { type: "activity", icon: Bell, title: "Certificate issued", body: "Your certificate for Rural Literacy Bootcamp is ready to download.", time: "1 day ago" },
-  { type: "reminder", icon: CalendarClock, title: "Event reminder: Blood Donation Mega Camp", body: "Registration closes in 48 hours — 18 slots remaining.", time: "2 days ago" },
-];
+import { useNotifications } from "@/lib/notification-store";
 
 const typeColor: Record<string, string> = {
   ai_recommendation: "text-espresso-600 dark:text-crema-200",
@@ -25,12 +13,14 @@ const typeColor: Record<string, string> = {
   reminder: "text-espresso-500",
   announcement: "text-crema-500",
   activity: "text-sage-500",
+  registration: "text-sage-600 dark:text-sage-400",
 };
 
-const filters = ["all", "ai_recommendation", "alert", "reminder", "announcement", "activity"] as const;
+const filters = ["all", "registration", "ai_recommendation", "alert", "reminder", "announcement", "activity"] as const;
 
 export default function NotificationsPage() {
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
+  const { notifications } = useNotifications();
   const filtered = filter === "all" ? notifications : notifications.filter((n) => n.type === filter);
 
   return (
@@ -56,11 +46,11 @@ export default function NotificationsPage() {
       </div>
 
       <div className="space-y-3">
-        {filtered.map((n, i) => {
+        {filtered.map((n) => {
           const isAi = n.type === "ai_recommendation";
           return (
             <Card
-              key={i}
+              key={n.id}
               className={cn(isAi && "border-espresso-300 bg-crema-swirl/10 dark:border-espresso-500/40")}
             >
               <CardContent className="flex items-start gap-4 p-4">

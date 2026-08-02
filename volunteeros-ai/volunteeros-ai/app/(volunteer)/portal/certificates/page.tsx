@@ -8,6 +8,7 @@ import { certificates } from "@/data/misc";
 import { currentVolunteer } from "@/components/portal/sidebar";
 import { Certificate } from "@/types";
 import { formatDate } from "@/lib/utils";
+import { CertificateWatermark, CertificateVerifyBlock } from "@/components/certificates/certificate-authenticity";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function PortalCertificatesPage() {
@@ -66,16 +67,19 @@ export default function PortalCertificatesPage() {
               onClick={() => setSelected(null)}
               className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 top-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
-            >
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
+              >
               <button onClick={() => setSelected(null)} className="absolute right-4 top-4" aria-label="Close">
                 <X size={18} />
               </button>
-              <div className="rounded-2xl border-4 border-double border-espresso-300 bg-crema-50 p-6 text-center dark:bg-white/5">
+              <div className="relative overflow-hidden rounded-2xl border-4 border-double border-espresso-300 bg-crema-50 p-6 text-center dark:bg-white/5">
+                <CertificateWatermark certificateId={selected.id} />
+                <div className="relative">
                 <Award size={32} className="mx-auto text-espresso-600" />
                 <div className="mt-3 font-display text-lg font-semibold text-espresso-800 dark:text-crema-100">
                   Certificate of Volunteer Service
@@ -86,12 +90,15 @@ export default function PortalCertificatesPage() {
                   completed {selected.hours} hours of service at
                 </p>
                 <div className="mt-1 text-sm font-medium text-foreground">{selected.eventTitle}</div>
+                <CertificateVerifyBlock certificateId={selected.id} />
+                </div>
               </div>
               <div className="mt-5 flex gap-2">
                 <Button className="flex-1"><Download size={15} /> Download PDF</Button>
                 <Button variant="outline" className="flex-1"><Share2 size={15} /> Share</Button>
               </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>

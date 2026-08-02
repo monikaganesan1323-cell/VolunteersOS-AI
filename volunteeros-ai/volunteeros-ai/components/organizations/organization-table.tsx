@@ -113,12 +113,13 @@ function AdminDetailsTrigger({ org }: { org: Organization }) {
               onClick={() => !sent && setOpen(false)}
               className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 top-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
-            >
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
+              >
               {!sent && (
                 <button onClick={() => setOpen(false)} className="absolute right-4 top-4" aria-label="Close">
                   <X size={18} />
@@ -174,6 +175,7 @@ function AdminDetailsTrigger({ org }: { org: Organization }) {
                 </>
               )}
             </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
@@ -183,14 +185,17 @@ function AdminDetailsTrigger({ org }: { org: Organization }) {
 
 const types = ["all", "Service Club", "College Program", "NGO", "Government"] as const;
 
-export function OrganizationTable() {
+export function OrganizationTable({ organizations: rows }: { organizations?: Organization[] }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<(typeof types)[number]>("all");
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  // Falls back to the seeded list when no rows are passed in.
+  const source = rows ?? organizations;
+
   const data = useMemo(
-    () => (typeFilter === "all" ? organizations : organizations.filter((o) => o.type === typeFilter)),
-    [typeFilter]
+    () => (typeFilter === "all" ? source : source.filter((o) => o.type === typeFilter)),
+    [source, typeFilter]
   );
 
   const table = useReactTable({

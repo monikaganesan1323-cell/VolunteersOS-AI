@@ -1,37 +1,36 @@
 import Link from "next/link";
 import {
   Users, CalendarCheck2, Clock, Award, Building2, TrendingUp, ArrowRight,
-  MapPin, CircleCheck,
+  CircleCheck,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { AuthBanner } from "@/components/dashboard/auth-banner";
+import { DashboardGreeting } from "@/components/dashboard/greeting";
+import { CreateEventDialog } from "@/components/events/create-event-dialog";
+import { UpcomingEvents } from "@/components/dashboard/upcoming-events";
 import { VolunteerGrowthChart, AttendanceChart } from "@/components/dashboard/charts";
-import { events } from "@/data/events";
 import { leaderboard, aiMatches, activityFeed, certificates } from "@/data/misc";
 import { formatDate } from "@/lib/utils";
 
 export default function DashboardHomePage() {
-  const upcoming = events.filter((e) => e.status === "upcoming").slice(0, 4);
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">
-            Good morning, Monika
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Here&apos;s what&apos;s brewing across your programs today.
-          </p>
+      <AuthBanner />
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <DashboardGreeting />
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/events">
+              All events <ArrowRight size={15} />
+            </Link>
+          </Button>
+          <CreateEventDialog />
         </div>
-        <Button asChild>
-          <Link href="/events">
-            Create Event <ArrowRight size={15} />
-          </Link>
-        </Button>
       </div>
 
       {/* Stat grid */}
@@ -95,34 +94,7 @@ export default function DashboardHomePage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex-row items-center justify-between space-y-0">
-            <CardTitle>Upcoming Events</CardTitle>
-            <Link href="/events" className="text-xs font-medium text-espresso-600 hover:underline dark:text-crema-300">
-              View all
-            </Link>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {upcoming.map((e) => (
-              <div key={e.id} className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-lg bg-espresso-50 text-espresso-700 dark:bg-white/5 dark:text-crema-200">
-                  <span className="text-[10px] font-medium uppercase leading-none">
-                    {new Date(e.date).toLocaleDateString("en-IN", { month: "short" })}
-                  </span>
-                  <span className="text-sm font-semibold leading-none">
-                    {new Date(e.date).getDate()}
-                  </span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium text-foreground">{e.title}</div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin size={11} /> {e.location.split(",")[0]}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <UpcomingEvents />
 
         <Card>
           <CardHeader>

@@ -9,17 +9,39 @@ import { AuthShell } from "@/components/shared/auth-shell";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import type { PreviousPosition } from "@/types";
+import { organizations } from "@/components/organizations/organization-table";
+import { useVolunteers } from "@/lib/volunteer-store";
+import type { PreviousPosition, Volunteer } from "@/types";
 
 const positions: PreviousPosition[] = ["Member", "President", "Secretary", "Treasurer", "Other"];
 
+const emptyForm = {
+  name: "",
+  city: "",
+  email: "",
+  phone: "",
+  organization: organizations[0]?.name ?? "",
+  prevOrg: "",
+  prevPosition: positions[0] as PreviousPosition,
+  prevJoined: "",
+  eventsParticipated: "",
+  skills: "",
+  interests: "",
+};
+
 export default function VolunteerRegisterPage() {
   const router = useRouter();
+  const { addVolunteer } = useVolunteers();
   const [loading, setLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [proofFiles, setProofFiles] = useState<string[]>([]);
+  const [form, setForm] = useState(emptyForm);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const proofInputRef = useRef<HTMLInputElement>(null);
+
+  function update(field: keyof typeof emptyForm, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -34,7 +56,33 @@ export default function VolunteerRegisterPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+
+    const volunteer: Volunteer = {
+      id: `V-${Date.now().toString(36).toUpperCase()}`,
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      city: form.city.trim(),
+      organization: form.organization,
+      skills: form.skills.split(",").map((s) => s.trim()).filter(Boolean),
+      interests: form.interests.split(",").map((s) => s.trim()).filter(Boolean),
+      hours: 0,
+      xp: 0,
+      level: 1,
+      eventsAttended: 0,
+      status: "pending",
+      joinedOn: new Date().toISOString().slice(0, 10),
+      badges: ["New Joiner"],
+      photoUrl: photoPreview ?? undefined,
+      previousOrganization: form.prevOrg.trim() || undefined,
+      previousPosition: form.prevPosition,
+      previousJoinedOn: form.prevJoined || undefined,
+      previousEventsParticipated: form.eventsParticipated.trim() || undefined,
+      certificationProofs: proofFiles.length > 0 ? proofFiles : undefined,
+    };
+
     setTimeout(() => {
+      addVolunteer(volunteer);
       setLoading(false);
       toast.success("Volunteer profile created — welcome aboard!");
       router.push("/portal");
@@ -67,23 +115,37 @@ export default function VolunteerRegisterPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="name">Full name</Label>
-            <Input id="name" placeholder="Ananya Krishnan" required />
+            <Input id="name" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Ananya Krishnan" required />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="area">Area / City</Label>
-            <Input id="area" placeholder="Kochi" required />
+            <Input id="area" value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="Kochi" required />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@example.com" required />
+            <Input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="phone">Phone number</Label>
-            <Input id="phone" type="tel" placeholder="+91 98470 22314" required />
+            <Input id="phone" type="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+91 98470 22314" required />
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="organization">Organization you're joining</Label>
+          <select
+            id="organization"
+            value={form.organization}
+            onChange={(e) => update("organization", e.target.value)}
+            className="h-11 w-full rounded-xl border border-border bg-white/70 px-4 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:bg-white/5"
+          >
+            {organizations.map((o) => (
+              <option key={o.name} value={o.name}>{o.name}</option>
+            ))}
+          </select>
         </div>
 
         <div className="rounded-xl border border-border p-4">
@@ -93,12 +155,14 @@ export default function VolunteerRegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="prevOrg">Previous club / organization</Label>
-              <Input id="prevOrg" placeholder="e.g. Kochi Lions Youth Wing" />
+              <Input id="prevOrg" value={form.prevOrg} onChange={(e) => update("prevOrg", e.target.value)} placeholder="e.g. Kochi Lions Youth Wing" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="prevPosition">Position held</Label>
               <select
                 id="prevPosition"
+                value={form.prevPosition}
+                onChange={(e) => update("prevPosition", e.target.value)}
                 className="h-11 w-full rounded-xl border border-border bg-white/70 px-4 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:bg-white/5"
               >
                 {positions.map((p) => (
@@ -107,9 +171,36 @@ export default function VolunteerRegisterPage() {
               </select>
             </div>
           </div>
-          <div className="mt-3 space-y-1.5">
-            <Label htmlFor="prevJoined">Date of joining (previous org)</Label>
-            <Input id="prevJoined" type="date" />
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="prevJoined">Date of joining (previous org)</Label>
+              <Input id="prevJoined" type="date" value={form.prevJoined} onChange={(e) => update("prevJoined", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="eventsParticipated">Events participated in before</Label>
+              <Input
+                id="eventsParticipated"
+                value={form.eventsParticipated}
+                onChange={(e) => update("eventsParticipated", e.target.value)}
+                placeholder="e.g. Beach cleanup, blood donation camp"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border p-4">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-espresso-600/70 dark:text-crema-300/60">
+            Skills &amp; interests <span className="normal-case text-muted-foreground">(helps us match you to the right events)</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="skills">Skills</Label>
+              <Input id="skills" value={form.skills} onChange={(e) => update("skills", e.target.value)} placeholder="First Aid, Teaching, Logistics" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="interests">Interests</Label>
+              <Input id="interests" value={form.interests} onChange={(e) => update("interests", e.target.value)} placeholder="Environment, Health, Education" />
+            </div>
           </div>
         </div>
 

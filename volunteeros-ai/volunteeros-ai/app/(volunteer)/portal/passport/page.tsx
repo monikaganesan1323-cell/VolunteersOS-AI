@@ -1,7 +1,11 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Download, Star, Clock, Award, ShieldCheck } from "lucide-react";
+import toast from "react-hot-toast";
+import { Download, Star, Clock, Award, ShieldCheck, LogIn, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { currentVolunteer } from "@/components/portal/sidebar";
 import { initials } from "@/lib/utils";
 
@@ -9,15 +13,33 @@ const qrCells = Array.from({ length: 64 }, (_, i) => (i * 37 + (i % 7) * 13) % 5
 const leadershipScore = 88;
 
 export default function PortalPassportPage() {
+  const router = useRouter();
   const v = currentVolunteer;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">My Passport</h1>
-        <p className="text-sm text-muted-foreground">
-          Your portable, verifiable profile — scan the QR to prove it at any partner organization.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-ink dark:text-crema-50">My Passport</h1>
+          <p className="text-sm text-muted-foreground">
+            Your portable, verifiable profile — scan the QR to prove it at any partner organization.
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/login"><LogIn size={14} /> Login</Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              toast.success("Signed out.");
+              router.push("/login");
+            }}
+          >
+            <LogOut size={14} /> Logout
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_1.1fr]">

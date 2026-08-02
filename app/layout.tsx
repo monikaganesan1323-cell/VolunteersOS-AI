@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/shared/theme-provider";
+import { AppStoreProvider } from "@/lib/store";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -41,7 +42,7 @@ export default function RootLayout({
         className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable} font-sans`}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          {children}
+          <AppStoreProvider>{children}</AppStoreProvider>
           <Toaster
             position="top-right"
             toastOptions={{

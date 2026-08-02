@@ -16,6 +16,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { certificates as seedCertificates } from "@/data/misc";
 import { Certificate } from "@/types";
 import { formatDate } from "@/lib/utils";
+import { CertificateWatermark, CertificateVerifyBlock } from "@/components/certificates/certificate-authenticity";
 import { AnimatePresence, motion } from "framer-motion";
 
 const columnHelper = createColumnHelper<Certificate>();
@@ -215,12 +216,13 @@ export default function CertificatesPage() {
               onClick={() => !generating && setFormOpen(false)}
               className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 top-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
-            >
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
+              >
               {!generating && (
                 <button onClick={() => setFormOpen(false)} className="absolute right-4 top-4" aria-label="Close">
                   <X size={18} />
@@ -296,6 +298,7 @@ export default function CertificatesPage() {
                 </>
               )}
             </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
@@ -311,17 +314,20 @@ export default function CertificatesPage() {
               onClick={() => setSelected(null)}
               className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 top-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
-            >
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
+              >
               <button onClick={() => setSelected(null)} className="absolute right-4 top-4" aria-label="Close">
                 <X size={18} />
               </button>
 
-              <div className="rounded-2xl border-4 border-double border-espresso-300 bg-crema-50 p-6 text-center dark:bg-white/5">
+              <div className="relative overflow-hidden rounded-2xl border-4 border-double border-espresso-300 bg-crema-50 p-6 text-center dark:bg-white/5">
+                <CertificateWatermark certificateId={selected.id} />
+                <div className="relative">
                 <Award size={32} className="mx-auto text-espresso-600" />
                 <div className="mt-3 font-display text-lg font-semibold text-espresso-800 dark:text-crema-100">
                   Certificate of Volunteer Service
@@ -342,6 +348,8 @@ export default function CertificatesPage() {
                     </span>
                   )}
                 </div>
+                <CertificateVerifyBlock certificateId={selected.id} />
+                </div>
               </div>
 
               <div className="mt-5 flex gap-2">
@@ -349,6 +357,7 @@ export default function CertificatesPage() {
                 <Button variant="outline" className="flex-1"><Share2 size={15} /> Share</Button>
               </div>
             </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>

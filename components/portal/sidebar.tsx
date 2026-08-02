@@ -1,19 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { HeartHandshake, ExternalLink } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { HeartHandshake, ExternalLink, LogOut, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { volunteers } from "@/data/volunteers";
+import { useStore } from "@/lib/store";
 import { ADMIN_ORIGIN } from "@/lib/ports";
 import { portalNavGroups } from "./nav-config";
 
-// In a real build this comes from the signed-in session.
+// Fallback profile shown when nobody is signed in yet.
 export const currentVolunteer = volunteers.find((v) => v.name === "Ananya Krishnan")!;
 
 export function PortalSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { hydrated, session, signOut } = useStore();
+
+  const displayName = hydrated && session ? session.name : currentVolunteer.name;
+  const displayOrg = hydrated && session ? session.organization : currentVolunteer.organization;
+
+  function handleSignOut() {
+    signOut();
+    toast.success("Signed out.");
+    router.push("/login");
+  }
 
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sage-500/15 bg-sage-500/[0.04] backdrop-blur-xl lg:flex dark:bg-sage-500/[0.03]">
@@ -60,12 +74,31 @@ export function PortalSidebar() {
         ))}
       </nav>
 
-      <div className="flex items-center gap-2.5 border-t border-sage-500/15 p-4">
-        <Avatar name={currentVolunteer.name} size={36} />
-        <div className="min-w-0 leading-tight">
-          <div className="truncate text-sm font-medium text-foreground">{currentVolunteer.name}</div>
-          <div className="text-xs text-muted-foreground">{currentVolunteer.organization}</div>
+      <div className="space-y-3 border-t border-sage-500/15 p-4">
+        <div className="flex items-center gap-2.5">
+          <Avatar name={displayName} size={36} />
+          <div className="min-w-0 leading-tight">
+            <div className="truncate text-sm font-medium text-foreground">{displayName}</div>
+            <div className="truncate text-xs text-muted-foreground">{displayOrg}</div>
+          </div>
         </div>
+
+        {hydrated && session ? (
+          <Button variant="outline" size="sm" className="w-full" onClick={handleSignOut}>
+            <LogOut size={14} /> Sign out
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1" asChild>
+              <Link href="/login">
+                <LogIn size={13} /> Sign in
+              </Link>
+            </Button>
+            <Button size="sm" className="flex-1" asChild>
+              <Link href="/volunteer-register">Register</Link>
+            </Button>
+          </div>
+        )}
       </div>
 
       <a

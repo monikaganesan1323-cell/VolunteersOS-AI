@@ -1,4 +1,5 @@
-import { notFound } from "next/navigation";
+"use client";
+
 import Link from "next/link";
 import {
   CalendarDays, MapPin, Users, Clock, ArrowLeft, ShieldAlert,
@@ -9,13 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Avatar } from "@/components/ui/avatar";
-import { events } from "@/data/events";
-import { volunteers } from "@/data/volunteers";
+import { useStore } from "@/lib/store";
 import { formatDate } from "@/lib/utils";
-
-export function generateStaticParams() {
-  return events.map((e) => ({ id: e.id }));
-}
 
 const checklist = [
   "Confirm venue access and parking",
@@ -32,11 +28,28 @@ const emergencyContacts = [
 ];
 
 export default function EventDetailPage({ params }: { params: { id: string } }) {
+  const { events, volunteers, hydrated } = useStore();
   const event = events.find((e) => e.id === params.id);
-  if (!event) notFound();
+
+  if (!event) {
+    return (
+      <div className="space-y-6">
+        <Link href="/events" className="inline-flex items-center gap-1.5 text-sm font-medium text-espresso-600 hover:underline dark:text-crema-300">
+          <ArrowLeft size={14} /> Back to events
+        </Link>
+        <Card>
+          <CardContent className="py-16 text-center">
+            <p className="text-sm text-muted-foreground">
+              {hydrated ? "That event no longer exists." : "Loading event..."}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const assigned = volunteers.slice(0, 6);
-  const fillRate = (event.registered / event.capacity) * 100;
+  const fillRate = event.capacity > 0 ? (event.registered / event.capacity) * 100 : 0;
 
   return (
     <div className="space-y-6">

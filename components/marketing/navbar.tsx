@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Coffee, LayoutDashboard, UserCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { Menu, X, Coffee, LayoutDashboard, UserCircle, LogOut, UserPlus, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { useStore } from "@/lib/store";
 import { ADMIN_ORIGIN, PORTAL_ORIGIN } from "@/lib/ports";
 
 const links = [
@@ -18,6 +22,15 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const { hydrated, session, signOut } = useStore();
+
+  function handleSignOut() {
+    signOut();
+    setOpen(false);
+    toast.success("Signed out.");
+    router.push("/login");
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -45,9 +58,6 @@ export function Navbar() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/login">Sign in</Link>
-            </Button>
             <Button variant="outline" size="sm" asChild>
               <a href={`${PORTAL_ORIGIN}/portal`}>
                 <UserCircle size={14} /> Volunteer Portal
@@ -58,9 +68,31 @@ export function Navbar() {
                 <LayoutDashboard size={14} /> Admin Dashboard
               </a>
             </Button>
-            <Button size="sm" asChild>
-              <Link href="/volunteer-register">Join as Volunteer</Link>
-            </Button>
+
+            {hydrated && session ? (
+              <div className="ml-1 flex items-center gap-2 border-l border-espresso-200/50 pl-3 dark:border-white/10">
+                <Avatar name={session.name} size={30} />
+                <span className="max-w-[120px] truncate text-sm font-medium text-espresso-800 dark:text-crema-100">
+                  {session.name}
+                </span>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut size={14} /> Sign out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/login">
+                    <LogIn size={14} /> Sign in
+                  </Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/register">
+                    <UserPlus size={14} /> Register
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           <button
@@ -96,13 +128,24 @@ export function Navbar() {
                 </a>
               </Button>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1" asChild>
-                  <Link href="/login">Sign in</Link>
-                </Button>
-                <Button size="sm" className="flex-1" asChild>
-                  <Link href="/volunteer-register">Join</Link>
-                </Button>
+                {hydrated && session ? (
+                  <Button variant="outline" size="sm" className="flex-1" onClick={handleSignOut}>
+                    <LogOut size={14} /> Sign out
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="outline" size="sm" className="flex-1" asChild>
+                      <Link href="/login">Sign in</Link>
+                    </Button>
+                    <Button size="sm" className="flex-1" asChild>
+                      <Link href="/register">Register</Link>
+                    </Button>
+                  </>
+                )}
               </div>
+              <Button variant="ghost" size="sm" className="w-full" asChild>
+                <Link href="/volunteer-register">Join as Volunteer</Link>
+              </Button>
             </div>
           </div>
         )}

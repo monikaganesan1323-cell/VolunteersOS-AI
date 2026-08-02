@@ -10,19 +10,40 @@ import { SocialLogin } from "@/components/shared/social-login";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useStore } from "@/lib/store";
+
+const emptyForm = {
+  firstName: "",
+  lastName: "",
+  organization: "",
+  email: "",
+};
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { registerOrganization } = useStore();
   const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+
+  function update(field: keyof typeof emptyForm, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+
+    registerOrganization({
+      name: `${form.firstName} ${form.lastName}`.trim(),
+      email: form.email,
+      organization: form.organization,
+    });
+
     setTimeout(() => {
       setLoading(false);
-      toast.success("Account created — verify your email to continue.");
-      router.push("/otp-verification");
-    }, 900);
+      toast.success(`Account created — you're signed in as ${form.organization}.`);
+      router.push("/dashboard");
+    }, 700);
   }
 
   return (
@@ -31,22 +52,47 @@ export default function RegisterPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="firstName">First name</Label>
-            <Input id="firstName" placeholder="Monika" required />
+            <Input
+              id="firstName"
+              value={form.firstName}
+              onChange={(e) => update("firstName", e.target.value)}
+              placeholder="Monika"
+              required
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="lastName">Last name</Label>
-            <Input id="lastName" placeholder="Varghese" required />
+            <Input
+              id="lastName"
+              value={form.lastName}
+              onChange={(e) => update("lastName", e.target.value)}
+              placeholder="Varghese"
+              required
+            />
           </div>
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="org">Organization</Label>
-          <Input id="org" placeholder="Rotaract Kochi" required />
+          <Input
+            id="org"
+            value={form.organization}
+            onChange={(e) => update("organization", e.target.value)}
+            placeholder="Rotaract Kochi"
+            required
+          />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="email">Work email</Label>
-          <Input id="email" type="email" placeholder="you@organization.org" required />
+          <Input
+            id="email"
+            type="email"
+            value={form.email}
+            onChange={(e) => update("email", e.target.value)}
+            placeholder="you@organization.org"
+            required
+          />
         </div>
 
         <div className="space-y-1.5">

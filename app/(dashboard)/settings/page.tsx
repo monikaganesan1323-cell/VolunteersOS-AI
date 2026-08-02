@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { SessionButton } from "@/components/shared/session-button";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -75,7 +76,10 @@ export default function SettingsPage() {
                     <Input defaultValue="monika@rotaractkochi.org" />
                   </div>
                 </div>
-                <Button onClick={() => toast.success("Profile updated")}>Save changes</Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button onClick={() => toast.success("Profile updated")}>Save changes</Button>
+                  <SessionButton />
+                </div>
               </CardContent>
             </Card>
           </Tabs.Content>

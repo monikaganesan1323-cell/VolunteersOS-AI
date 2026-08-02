@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles, X, Send, Users, FileText, Search, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAssistant } from "@/hooks/use-assistant";
 
 const suggestions = [
   { icon: FileText, label: "Generate report" },
@@ -14,21 +15,15 @@ const suggestions = [
 
 export function AIChatWidget() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { from: "ai", text: "Hi Monika! I'm your VolunteerOS AI assistant. I can generate reports, match volunteers, and summarize analytics — what do you need?" },
-  ]);
+  const { messages, pending, send } = useAssistant(
+    "Hi Monika! I'm your VolunteerOS AI assistant. I can generate reports, match volunteers, and summarize analytics — what do you need?"
+  );
   const [input, setInput] = useState("");
 
-  function send(text: string) {
+  function handleSend(text: string) {
     if (!text.trim()) return;
-    setMessages((m) => [...m, { from: "user", text }]);
     setInput("");
-    setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        { from: "ai", text: "Got it — pulling that together from your latest volunteer and event data now. This is a demo response for the hackathon build." },
-      ]);
-    }, 700);
+    void send(text);
   }
 
   return (
@@ -65,13 +60,18 @@ export function AIChatWidget() {
                   {m.text}
                 </div>
               ))}
+              {pending && (
+                <div className="max-w-[85%] rounded-2xl bg-muted px-4 py-2.5 text-sm leading-relaxed text-muted-foreground">
+                  …
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2 border-t border-border p-3">
               {suggestions.map((s) => (
                 <button
                   key={s.label}
-                  onClick={() => send(s.label)}
+                  onClick={() => handleSend(s.label)}
                   className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-espresso-700 hover:bg-espresso-50 dark:text-crema-200 dark:hover:bg-white/5"
                 >
                   <s.icon size={12} /> {s.label}
@@ -82,7 +82,7 @@ export function AIChatWidget() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                send(input);
+                handleSend(input);
               }}
               className="flex items-center gap-2 border-t border-border p-3"
             >
@@ -92,7 +92,7 @@ export function AIChatWidget() {
                 placeholder="Ask the assistant..."
                 className="h-10 flex-1 rounded-xl border border-border bg-muted/60 px-3.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
-              <Button type="submit" size="icon">
+              <Button type="submit" size="icon" disabled={pending}>
                 <Send size={15} />
               </Button>
             </form>

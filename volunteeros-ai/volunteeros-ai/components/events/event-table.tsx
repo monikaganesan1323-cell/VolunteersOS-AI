@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
 import {
-  ArrowUpDown, X, MapPin, CalendarDays, Users, Eye,
+  ArrowUpDown, X, MapPin, CalendarDays, Users, Eye, CalendarPlus,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { VolunteerEvent } from "@/types";
 import { formatDate } from "@/lib/utils";
+import { downloadIcs } from "@/lib/calendar";
+import { RegisterButton } from "@/components/events/register-button";
 import { AnimatePresence, motion } from "framer-motion";
 
 const statusVariant: Record<VolunteerEvent["status"], "success" | "secondary" | "warning" | "outline"> = {
@@ -106,12 +109,13 @@ export function EventTable({ table }: { table: TanstackTable<VolunteerEvent> }) 
               onClick={() => setSelected(null)}
               className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="fixed left-1/2 top-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
-            >
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-warm-lg"
+              >
               <button onClick={() => setSelected(null)} className="absolute right-4 top-4" aria-label="Close">
                 <X size={18} />
               </button>
@@ -137,8 +141,22 @@ export function EventTable({ table }: { table: TanstackTable<VolunteerEvent> }) 
                 </div>
               </div>
 
-              <Button className="mt-5 w-full">Manage event</Button>
-            </motion.div>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    downloadIcs(selected);
+                    toast.success("Added to calendar.");
+                  }}
+                >
+                  <CalendarPlus size={15} /> Add to calendar
+                </Button>
+                <RegisterButton event={selected} size="default" className="flex-1" stopPropagation={false} />
+                <Button className="w-full">Manage event</Button>
+              </div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
